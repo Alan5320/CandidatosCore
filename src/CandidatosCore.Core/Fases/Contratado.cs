@@ -4,7 +4,7 @@ public sealed class Contratado : FaseBase
 {
     public override string Nombre => "Contratado";
 
-    public override void Avanzar() =>
+    public override FaseBase Avanzar() =>
         throw new InvalidOperationException($"Transición inválida: {Nombre} no tiene una siguiente etapa");
 
     public override void Rechazar() =>
