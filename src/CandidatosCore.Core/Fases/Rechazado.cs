@@ -4,7 +4,7 @@ public sealed class Rechazado : FaseBase
 {
     public override string Nombre => "Rechazado";
 
-    public override void Avanzar() =>
+    public override FaseBase Avanzar() =>
         throw new InvalidOperationException($"Transición inválida: {Nombre} no tiene una siguiente etapa");
 
     public override void Rechazar() =>
