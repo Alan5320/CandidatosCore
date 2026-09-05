@@ -7,7 +7,7 @@ public sealed class HistorialCambios
 {
     private readonly List<RegistroCambio> registros = new();
 
-    public RegistroCambio RegistrarCambio(Candidato candidato, Fase anterior, Fase nuevo, string actor, TipoCambio tipo)
+    public RegistroCambio RegistrarCambio(Candidato candidato, FaseBase anterior, FaseBase nuevo, string actor, TipoCambio tipo)
     {
         var registro = new RegistroCambio(candidato, anterior, nuevo, actor, tipo);
         registros.Add(registro);

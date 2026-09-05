@@ -7,7 +7,7 @@ public sealed class Candidato
     public string Nombre { get; }
     public string Correo { get; }
 
-    private Fase faseActual;
+    private FaseBase faseActual;
 
     public Candidato(string nombre, string correo)
     {
@@ -21,11 +21,11 @@ public sealed class Candidato
 
     public void Rechazar() => faseActual.Rechazar();
 
-    public void CambiarFase(Fase nuevaFase)
+    public void CambiarFase(FaseBase nuevaFase)
     {
         nuevaFase.SetContext(this);
         faseActual = nuevaFase;
     }
 
-    public Fase ObtenerFaseActual() => faseActual;
+    public FaseBase ObtenerFaseActual() => faseActual;
 }
