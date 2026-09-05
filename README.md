@@ -8,11 +8,11 @@ El `GestorDeCandidato` original mezclaba transiciones de estado, reglas de notif
 
 | Patrón | Requisito que resuelve | Clases involucradas |
 |---|---|---|
-| **State** | Agregar etapas (ej. Prueba técnica, Verificación de referencias) sin tocar las existentes; cada etapa declara a cuál puede avanzar. | `Fase`, `FaseBase`, `Aplicado`, `Entrevista`, `PruebaTecnica`, `Oferta`, `VerificacionReferencias`, `Contratado`, `Rechazado` |
+| **State** | Agregar etapas (ej. Prueba técnica, Verificación de referencias) sin tocar las existentes; cada etapa declara a cuál puede avanzar. | `FaseBase`, `Aplicado`, `Entrevista`, `PruebaTecnica`, `Oferta`, `VerificacionReferencias`, `Contratado`, `Rechazado` |
 | **Observer** | Notificaciones diferenciadas por rol (reclutador, gerente, nómina, portal) sin que el gestor conozca a los destinatarios. | `NotificadorCambios`, `ObservadorCambio`, `SuscriptorNotificacion` |
 | **Memento** | Deshacer la última transición y mantener auditoría de quién y cuándo. | `HistorialCambios` (caretaker), `RegistroCambio` (memento) |
 
-`Candidato` es el *Context* del State: delega `Avanzar()`/`Rechazar()` en su `Fase` actual. `GestorDeCandidato` solo coordina: ejecuta la transición sobre el candidato, pide a `HistorialCambios` que la registre, y a `NotificadorCambios` que la informe.
+`Candidato` es el *Context* del State: delega `Avanzar()`/`Rechazar()` en su `FaseBase` actual. Cada etapa concreta solo declara su `Nombre` — `FaseBase` guarda una tabla estática (`SiguientePaso`) que sabe, para cada nombre de etapa, cuál es la siguiente; agregar una etapa nueva significa crear una clase y registrarla ahí, sin tocar las etapas existentes. `Contratado` y `Rechazado` son las únicas etapas que sobrescriben `Avanzar()`/`Rechazar()`, porque son estados terminales. `GestorDeCandidato` solo coordina: ejecuta la transición sobre el candidato, pide a `HistorialCambios` que la registre, y a `NotificadorCambios` que la informe.
 
 ## Estructura
 
@@ -20,7 +20,7 @@ El `GestorDeCandidato` original mezclaba transiciones de estado, reglas de notif
 src/
   CandidatosCore.Core/
     Dominio/          Candidato (Context)
-    Fases/            Fase, FaseBase y las etapas concretas (State)
+    Fases/            FaseBase (con la tabla de transiciones) y las etapas concretas (State)
     Historial/        RegistroCambio, HistorialCambios (Memento)
     Notificaciones/    ObservadorCambio, NotificadorCambios, SuscriptorNotificacion (Observer)
     GestorDeCandidato.cs
@@ -57,26 +57,30 @@ classDiagram
         <<Context>>
         +Nombre
         +Correo
-        -faseActual : Fase
+        -faseActual : FaseBase
         +Avanzar()
         +Rechazar()
         +CambiarFase(nuevaFase)
         +ObtenerFaseActual()
     }
 
-    class Fase {
-        <<interface>>
-        +Nombre
+    class FaseBase {
+        <<abstract>>
+        +SiguientePaso : Dictionary~string, FaseBase~$
+        #Context : Candidato
+        +Nombre : string*
         +SetContext(candidato)
-        +Avanzar()
+        +Avanzar() FaseBase
         +Rechazar()
     }
 
-    class FaseBase {
-        <<abstract>>
-        #Context : Candidato
-        +SetContext(candidato)
-        +Avanzar()*
+    class Contratado {
+        +Avanzar() FaseBase
+        +Rechazar()
+    }
+
+    class Rechazado {
+        +Avanzar() FaseBase
         +Rechazar()
     }
 
@@ -84,15 +88,23 @@ classDiagram
         -registros : List~RegistroCambio~
         +RegistrarCambio(candidato, anterior, nuevo, actor, tipo)
         +DeshacerUltimo(candidato, actor)
+        +ObtenerRegistros(candidato)
     }
 
     class RegistroCambio {
         +Candidato
-        +EstadoAnterior : Fase
-        +EstadoNuevo : Fase
+        +EstadoAnterior : FaseBase
+        +EstadoNuevo : FaseBase
         +Actor
         +Fecha
-        +Tipo
+        +Tipo : TipoCambio
+    }
+
+    class TipoCambio {
+        <<enumeration>>
+        Avance
+        Rechazo
+        Deshacer
     }
 
     class NotificadorCambios {
@@ -115,8 +127,7 @@ classDiagram
     GestorDeCandidato --> Candidato : administra
     GestorDeCandidato --> HistorialCambios : delega
     GestorDeCandidato --> NotificadorCambios : informa
-    Candidato o-- Fase : fase actual
-    Fase <|.. FaseBase
+    Candidato o-- FaseBase : fase actual
     FaseBase <|-- Aplicado
     FaseBase <|-- Entrevista
     FaseBase <|-- PruebaTecnica
@@ -125,8 +136,10 @@ classDiagram
     FaseBase <|-- Contratado
     FaseBase <|-- Rechazado
     FaseBase ..> Candidato : cambia el context
+    FaseBase ..> FaseBase : consulta SiguientePaso
     HistorialCambios o-- RegistroCambio
-    RegistroCambio --> Fase : anterior y nueva
+    RegistroCambio --> FaseBase : anterior y nueva
+    RegistroCambio --> TipoCambio
     ObservadorCambio <|.. SuscriptorNotificacion
     NotificadorCambios o-- ObservadorCambio
 ```
