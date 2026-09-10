@@ -11,7 +11,7 @@ public sealed class SuscriptorNotificacion : ObservadorCambio
 
     public bool conComentario { get; }
 
-    public SuscriptorNotificacion(string destinatario, IEnumerable<string> eventosDeInteres, string conDescripcion)
+    public SuscriptorNotificacion(string destinatario, IEnumerable<string> eventosDeInteres, bool? conComentario)
     {
         Destinatario = destinatario;
         EventosDeInteres = new HashSet<string>(eventosDeInteres);

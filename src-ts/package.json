@@ -1,0 +1,14 @@
+{
+  "name": "candidatos-core-ts",
+  "version": "1.0.0",
+  "description": "Rediseño de HireCore en TypeScript",
+  "main": "CandidatosCore.App/Program.ts",
+  "scripts": {
+    "start": "ts-node CandidatosCore.App/Program.ts",
+    "build": "tsc"
+  },
+  "devDependencies": {
+    "ts-node": "^10.9.2",
+    "typescript": "^5.3.3"
+  }
+}
