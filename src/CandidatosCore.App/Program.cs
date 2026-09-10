@@ -16,16 +16,16 @@ var candidato = new Candidato("Ana Torres", "ana.torres@correo.com");
 
 Console.WriteLine($"--- Proceso de {candidato.Nombre} ---");
 
-gestor.Avanzar(candidato, "reclutador.laura");
-gestor.Avanzar(candidato, "reclutador.laura");
-gestor.Avanzar(candidato, "reclutador.laura");
+gestor.Avanzar(candidato, "reclutador.laura", "Avanza por que me cae bien");
+gestor.Avanzar(candidato, "reclutador.laura", "Avanza por que me cae bien");
+gestor.Avanzar(candidato, "reclutador.laura", "Avanza por que me cae bien");
 
 Console.WriteLine($"Fase actual: {candidato.ObtenerFaseActual().Nombre}");
 
-gestor.Rechazar(candidato, "reclutador.laura");
+gestor.Rechazar(candidato, "reclutador.laura", "Rechaza por que no me cae bien");
 Console.WriteLine($"Fase actual: {candidato.ObtenerFaseActual().Nombre}");
 
-gestor.DeshacerUltimo(candidato, "rrhh.supervisor");
+gestor.DeshacerUltimo(candidato, "rrhh.supervisor", "Deshace porque no me cae bien");
 Console.WriteLine($"Fase actual tras deshacer: {candidato.ObtenerFaseActual().Nombre}");
 
 foreach (var registro in historial.ObtenerRegistros(candidato))

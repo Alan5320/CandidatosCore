@@ -12,6 +12,8 @@ public sealed class RegistroCambio
     public DateTime Fecha { get; }
     public TipoCambio Tipo { get; }
 
+    public string Comentario { get; }
+
     public RegistroCambio(Candidato candidato, FaseBase estadoAnterior, FaseBase estadoNuevo, string actor, TipoCambio tipo)
     {
         Candidato = candidato;
@@ -20,5 +22,6 @@ public sealed class RegistroCambio
         Actor = actor;
         Tipo = tipo;
         Fecha = DateTime.UtcNow;
+        Comentario = comentario;
     }
 }

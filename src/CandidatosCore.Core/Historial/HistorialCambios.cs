@@ -24,7 +24,7 @@ public sealed class HistorialCambios
         registros.Remove(ultimo);
         candidato.CambiarFase(ultimo.EstadoAnterior);
 
-        return RegistrarCambio(candidato, ultimo.EstadoNuevo, ultimo.EstadoAnterior, actor, TipoCambio.Deshacer);
+        return RegistrarCambio(candidato, ultimo.EstadoNuevo, ultimo.EstadoAnterior, actor, TipoCambio.Deshacer, ultimo.comentario);
     }
 
     public IReadOnlyList<RegistroCambio> ObtenerRegistros(Candidato candidato) =>
