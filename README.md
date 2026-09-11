@@ -12,7 +12,7 @@ El `GestorDeCandidato` original mezclaba transiciones de estado, reglas de notif
 | **Observer** | Notificaciones diferenciadas por rol (reclutador, gerente, nómina, portal) sin que el gestor conozca a los destinatarios. | `NotificadorCambios`, `ObservadorCambio`, `SuscriptorNotificacion` |
 | **Memento** | Deshacer la última transición y mantener auditoría de quién y cuándo. | `HistorialCambios` (caretaker), `RegistroCambio` (memento) |
 
-`Candidato` es el *Context* del State: delega `Avanzar()`/`Rechazar()` en su `FaseBase` actual. Cada etapa concreta solo declara su `Nombre` — `FaseBase` guarda una tabla estática (`SiguientePaso`) que sabe, para cada nombre de etapa, cuál es la siguiente; agregar una etapa nueva significa crear una clase y registrarla ahí, sin tocar las etapas existentes. `Contratado` y `Rechazado` son las únicas etapas que sobrescriben `Avanzar()`/`Rechazar()`, porque son estados terminales. `GestorDeCandidato` solo coordina: ejecuta la transición sobre el candidato, pide a `HistorialCambios` que la registre, y a `NotificadorCambios` que la informe.
+`Candidato` es el *Context* del State: delega `Avanzar()`/`Rechazar()` en su `FaseBase` actual. Cada cambio conserva actor, fecha, comentario y si el comentario es una nota interna. `GestorDeCandidato` solo coordina: ejecuta la transición sobre el candidato, pide a `HistorialCambios` que la registre, y a `NotificadorCambios` que la informe. Cada `SuscriptorNotificacion` decide qué etapas recibe y si puede ver comentarios; el portal recibe el evento, pero no el contenido de notas internas.
 
 ## Estructura
 
@@ -48,9 +48,9 @@ classDiagram
     class GestorDeCandidato {
         -HistorialCambios historial
         -NotificadorCambios notificador
-        +Avanzar(candidato, actor)
-        +Rechazar(candidato, actor)
-        +DeshacerUltimo(candidato, actor)
+        +Avanzar(candidato, actor, comentario, esNotaInterna)
+        +Rechazar(candidato, actor, comentario, esNotaInterna)
+        +DeshacerUltimo(candidato, actor, comentario)
     }
 
     class Candidato {
@@ -98,6 +98,8 @@ classDiagram
         +Actor
         +Fecha
         +Tipo : TipoCambio
+        +Comentario
+        +EsNotaInterna
     }
 
     class TipoCambio {
@@ -121,7 +123,13 @@ classDiagram
     class SuscriptorNotificacion {
         +Destinatario
         +EventosDeInteres
+        +IncluirComentario
+        +IncluirNotasInternas
         +Actualizar(cambio)
+    }
+
+    class EmailService {
+        +Enviar(destinatario, mensaje, comentario)
     }
 
     GestorDeCandidato --> Candidato : administra
@@ -142,4 +150,5 @@ classDiagram
     RegistroCambio --> TipoCambio
     ObservadorCambio <|.. SuscriptorNotificacion
     NotificadorCambios o-- ObservadorCambio
+    SuscriptorNotificacion ..> EmailService : envía
 ```

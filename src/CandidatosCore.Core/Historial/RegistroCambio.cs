@@ -13,8 +13,9 @@ public sealed class RegistroCambio
     public TipoCambio Tipo { get; }
 
     public string Comentario { get; }
+    public bool EsNotaInterna { get; }
 
-    public RegistroCambio(Candidato candidato, FaseBase estadoAnterior, FaseBase estadoNuevo, string actor, TipoCambio tipo)
+    public RegistroCambio(Candidato candidato, FaseBase estadoAnterior, FaseBase estadoNuevo, string actor, TipoCambio tipo, string comentario = "", bool esNotaInterna = false)
     {
         Candidato = candidato;
         EstadoAnterior = estadoAnterior;
@@ -23,5 +24,6 @@ public sealed class RegistroCambio
         Tipo = tipo;
         Fecha = DateTime.UtcNow;
         Comentario = comentario;
+        EsNotaInterna = esNotaInterna;
     }
 }

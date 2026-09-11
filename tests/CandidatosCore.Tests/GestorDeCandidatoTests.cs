@@ -113,6 +113,35 @@ public sealed class GestorDeCandidatoTests
         Assert.Equal(TipoCambio.Avance, registros[0].Tipo);
     }
 
+    [Fact]
+    public void HistorialCambios_ConservaLaNotaInterna()
+    {
+        var (gestor, historial, _) = CrearGestor();
+        var candidato = new Candidato("Ana", "ana@correo.com");
+
+        gestor.Avanzar(candidato, "reclutador.laura", "Validar referencias", true);
+
+        var registro = Assert.Single(historial.ObtenerRegistros(candidato));
+        Assert.Equal("Validar referencias", registro.Comentario);
+        Assert.True(registro.EsNotaInterna);
+    }
+
+    [Fact]
+    public void DeshacerUltimo_ConservaElCambioOriginalEnLaAuditoria()
+    {
+        var (gestor, historial, _) = CrearGestor();
+        var candidato = new Candidato("Ana", "ana@correo.com");
+
+        gestor.Avanzar(candidato, "reclutador");
+        gestor.DeshacerUltimo(candidato, "supervisor", "Corrección autorizada");
+
+        var registros = historial.ObtenerRegistros(candidato);
+        Assert.Equal(2, registros.Count);
+        Assert.Equal(TipoCambio.Avance, registros[0].Tipo);
+        Assert.Equal(TipoCambio.Deshacer, registros[1].Tipo);
+        Assert.Equal("supervisor", registros[1].Actor);
+    }
+
     private sealed class EspiaObservador : ObservadorCambio
     {
         private readonly List<string> eventosRecibidos;

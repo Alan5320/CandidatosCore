@@ -9,13 +9,15 @@ public sealed class SuscriptorNotificacion : ObservadorCambio
     public string Destinatario { get; }
     public IReadOnlySet<string> EventosDeInteres { get; }
 
-    public bool conComentario { get; }
+    public bool IncluirComentario { get; }
+    public bool IncluirNotasInternas { get; }
 
-    public SuscriptorNotificacion(string destinatario, IEnumerable<string> eventosDeInteres, bool? conComentario)
+    public SuscriptorNotificacion(string destinatario, IEnumerable<string> eventosDeInteres, bool incluirComentario = true, bool incluirNotasInternas = false)
     {
         Destinatario = destinatario;
         EventosDeInteres = new HashSet<string>(eventosDeInteres);
-        this.conComentario = conComentario ?? false;
+        IncluirComentario = incluirComentario;
+        IncluirNotasInternas = incluirNotasInternas;
     }
 
     public void Actualizar(RegistroCambio cambio)
@@ -23,9 +25,11 @@ public sealed class SuscriptorNotificacion : ObservadorCambio
         if (!EventosDeInteres.Contains(Todos) && !EventosDeInteres.Contains(cambio.EstadoNuevo.Nombre))
             return;
 
-        string descripcion = conComentario ? $"{cambio.Comentario}" : null;
+        string? descripcion = IncluirComentario && (!cambio.EsNotaInterna || IncluirNotasInternas)
+            ? cambio.Comentario
+            : null;
 
-        EmailService.Enviar(Destinatario, DescribirCambio(cambio), comentario);
+        EmailService.Enviar(Destinatario, DescribirCambio(cambio), descripcion);
     }
 
     private static string DescribirCambio(RegistroCambio cambio) => cambio.Tipo switch

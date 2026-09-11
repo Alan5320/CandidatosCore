@@ -6,17 +6,17 @@ using CandidatosCore.Core.Notificaciones;
 var historial = new HistorialCambios();
 var notificador = new NotificadorCambios();
 
-notificador.Suscribir(new SuscriptorNotificacion("reclutador@hirecore.com", new[] { SuscriptorNotificacion.Todos }));
+notificador.Suscribir(new SuscriptorNotificacion("reclutador@hirecore.com", new[] { SuscriptorNotificacion.Todos }, true, true));
 notificador.Suscribir(new SuscriptorNotificacion("gerente.contratacion@hirecore.com", new[] { "Oferta", "Contratado" }));
 notificador.Suscribir(new SuscriptorNotificacion("nomina@hirecore.com", new[] { "Contratado" }));
-notificador.Suscribir(new SuscriptorNotificacion("portal@hirecore.com", new[] { SuscriptorNotificacion.Todos }));
+notificador.Suscribir(new SuscriptorNotificacion("portal@hirecore.com", new[] { SuscriptorNotificacion.Todos }, false));
 
 var gestor = new GestorDeCandidato(historial, notificador);
 var candidato = new Candidato("Ana Torres", "ana.torres@correo.com");
 
 Console.WriteLine($"--- Proceso de {candidato.Nombre} ---");
 
-gestor.Avanzar(candidato, "reclutador.laura", "Avanza por que me cae bien");
+gestor.Avanzar(candidato, "reclutador.laura", "Validar experiencia laboral", true);
 gestor.Avanzar(candidato, "reclutador.laura", "Avanza por que me cae bien");
 gestor.Avanzar(candidato, "reclutador.laura", "Avanza por que me cae bien");
 
